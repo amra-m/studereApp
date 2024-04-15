@@ -16,6 +16,7 @@
 		B6F310CB2BCD5EAA00BB63AF /* HomeViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6F310CA2BCD5EAA00BB63AF /* HomeViewController.swift */; };
 		B6F310CD2BCD5EB400BB63AF /* LoginViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6F310CC2BCD5EB400BB63AF /* LoginViewController.swift */; };
 		B6F310CF2BCD5EBD00BB63AF /* SignUpViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6F310CE2BCD5EBD00BB63AF /* SignUpViewController.swift */; };
+		B6F311152BCD798200BB63AF /* TimerViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6F311142BCD798200BB63AF /* TimerViewController.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -30,6 +31,7 @@
 		B6F310CA2BCD5EAA00BB63AF /* HomeViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeViewController.swift; sourceTree = "<group>"; };
 		B6F310CC2BCD5EB400BB63AF /* LoginViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginViewController.swift; sourceTree = "<group>"; };
 		B6F310CE2BCD5EBD00BB63AF /* SignUpViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SignUpViewController.swift; sourceTree = "<group>"; };
+		B6F311142BCD798200BB63AF /* TimerViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TimerViewController.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -72,6 +74,7 @@
 				B6F310CA2BCD5EAA00BB63AF /* HomeViewController.swift */,
 				B6F310CC2BCD5EB400BB63AF /* LoginViewController.swift */,
 				B6F310CE2BCD5EBD00BB63AF /* SignUpViewController.swift */,
+				B6F311142BCD798200BB63AF /* TimerViewController.swift */,
 			);
 			path = studereApp;
 			sourceTree = "<group>";
@@ -150,6 +153,7 @@
 				B6F310CF2BCD5EBD00BB63AF /* SignUpViewController.swift in Sources */,
 				B6F310BB2BCD5D2100BB63AF /* ViewController.swift in Sources */,
 				B6F310B72BCD5D2100BB63AF /* AppDelegate.swift in Sources */,
+				B6F311152BCD798200BB63AF /* TimerViewController.swift in Sources */,
 				B6F310B92BCD5D2100BB63AF /* SceneDelegate.swift in Sources */,
 				B6F310CD2BCD5EB400BB63AF /* LoginViewController.swift in Sources */,
 				B6F310CB2BCD5EAA00BB63AF /* HomeViewController.swift in Sources */,
