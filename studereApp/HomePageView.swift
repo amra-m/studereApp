@@ -76,6 +76,7 @@ struct HomePageView: View {
                             .foregroundColor(.black)
                         
                         // Week calendar
+                        // Elements of this component were enhanced with AI Assistance, for example the ScrollView with a horizontal access, as well as the ForEach and handling user interactions. 
                         ScrollView(.horizontal, showsIndicators: false) {
                             HStack(spacing: 20) {
                                 ForEach(0..<7, id: \.self) { index in
@@ -116,28 +117,9 @@ struct HomePageView: View {
                     HStack {
                         Spacer()
                         
-                        // Plus Button
-                        Button(action:{
-                            showingAddTask = true
-                        }) {
-                            Image(systemName: "plus")
-                                .font(.system(size: 30))
-                                .imageScale(.large)
-                                .bold()
-                                .frame(width: 70, height: 90)
-                                .background(.purple)
-                                .foregroundColor(.white)
-                                .clipShape(Circle())
-                        }
-                        .padding(.trailing, 25)
-                        .sheet(isPresented: $showingAddTask){
-                            AddTaskView(onAdd: { newTask in tasks.append(newTask)
-                                
-                            })
-                        }
                     }
                     
-                    .padding(.bottom, 40)
+                    .padding(.bottom, 10)
                     
                     HStack {
                         
@@ -152,6 +134,27 @@ struct HomePageView: View {
                         
                         Spacer()
                         
+                        // Plus Button
+                        Button(action:{
+                            showingAddTask = true
+                        }) {
+                            Image(systemName: "plus")
+                                .font(.system(size: 30))
+                                .imageScale(.large)
+                                .bold()
+                                .frame(width: 70, height: 70)
+                                .background(.purple)
+                                .foregroundColor(.white)
+                                .clipShape(Circle())
+                        }
+                        .padding(.horizontal, 65)
+                        .sheet(isPresented: $showingAddTask){
+                            AddTaskView(onAdd: { newTask in tasks.append(newTask)
+                                
+                            })
+                        }
+                        
+                        
                         // Timer Button
                         Button {
                             showingTimerView = true
@@ -163,20 +166,16 @@ struct HomePageView: View {
                             TimerViewControllerRepresentable()
                         }
                         
-                        Spacer()
-                        
-                        // Trophy Button
-                        Button {
-
-                        } label: {
-                            Image(systemName: "trophy.fill")
-                                .imageScale(.large)
-                        }
+                                                
                     }
-                    .padding(.horizontal, 50)
+                    .padding(.horizontal, 65)
                 }
                 .background(Color.clear)
             }
+            .onAppear(perform: {
+                UNUserNotificationCenter.current().requestAuthorization(options: [.badge, .sound, .alert]) { (_, _) in
+                }
+            })
             .foregroundColor(.gray)
             .background(Color("Background"))
         }

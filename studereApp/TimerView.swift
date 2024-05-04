@@ -1,50 +1,37 @@
 import SwiftUI
-import UserNotifications
 
-struct ContentView: View {
+struct TimerView: View {
     var body: some View {
         NavigationView {
-            Home()
+            TimerScreen()
         }
     }
 }
 
-struct ContentView_Previews: PreviewProvider {
+struct TimerView_Previews: PreviewProvider {
     static var previews: some View {
-        ContentView()
+        TimerView()
     }
 }
 
-struct PreviousView: View {
-    var body: some View {
-        Text("Previous View")
-    }
-}
-
-struct Home: View {
+struct TimerScreen: View {
     @Environment(\.presentationMode) var presentationMode
+    @State private var isTimerRunning = false
+    @State private var timerProgress: CGFloat = 0
+    @State private var elapsedSeconds = 0
+    @State private var selectedHours = 0
+    @State private var selectedMinutes = 0
+    @State private var selectedSeconds = 0
+    @State private var timer = Timer.publish(every: 1, on: .main, in: .common).autoconnect()
     
-    @State var start = false
-    @State var to: CGFloat = 0
-    @State var count = 0
-    @State var time = Timer.publish(every: 1, on: .main, in: .common).autoconnect()
-    @State var selectedHours = 0
-    @State var selectedMinutes = 0
-    @State var selectedSeconds = 0
+    //Picker options
+    private let hours = Array(0...23)
+    private let minutes = Array(0...59)
+    private let seconds = Array(0...59)
     
-    let hours = Array(0...23)
-    let minutes = Array(0...59)
-    let seconds = Array(0...59)
-    
-    var totalDuration: Int {
-        return selectedHours * 3600 + selectedMinutes * 60 + selectedSeconds
-    }
-    
-    var selectedDurationString: String {
-        let hours = selectedHours < 5 ? "0\(selectedHours)" : "\(selectedHours)"
-        let minutes = selectedMinutes < 5 ? "0\(selectedMinutes)" : "\(selectedMinutes)"
-        let seconds = selectedSeconds < 5 ? "0\(selectedSeconds)" : "\(selectedSeconds)"
-        return "\(hours):\(minutes):\(seconds)"
+    //Total time in seconds
+    private var totalDuration: Int {
+        selectedHours * 3600 + selectedMinutes * 60 + selectedSeconds
     }
     
     var body: some View {
@@ -52,6 +39,7 @@ struct Home: View {
             Color.black.opacity(0.06).edgesIgnoringSafeArea(.all)
             
             VStack {
+                //Back button
                 HStack {
                     Button(action: {
                         presentationMode.wrappedValue.dismiss()
@@ -67,6 +55,7 @@ struct Home: View {
                 
                 Spacer()
                 
+                //Timer progress circle
                 ZStack {
                     Circle()
                         .trim(from: 0, to: 1)
@@ -74,26 +63,27 @@ struct Home: View {
                         .frame(width: 320, height: 320)
                     
                     Circle()
-                        .trim(from: 0, to: self.to)
+                        .trim(from: 0, to: timerProgress)
                         .stroke(Color.purple, style: StrokeStyle(lineWidth: 40, lineCap: .round))
                         .frame(width: 320, height: 320)
                         .rotationEffect(.init(degrees: -90))
                     
                     VStack {
-                        Text(formattedTime(seconds: self.count))
+                        Text(formatTime(seconds: elapsedSeconds))
                             .font(.system(size: 50))
                             .fontWeight(.bold)
                     }
                 }
                 
+                //Duration picker
                 HStack {
+                    //Hours picker
                     VStack {
-                        Text(" ")
-                        Text(" ")
+                        Spacer()
                         Text("Hours")
                             .font(.headline)
                         
-                        Picker("Hours", selection: self.$selectedHours) {
+                        Picker("Hours", selection: $selectedHours) {
                             ForEach(hours, id: \.self) { hour in
                                 Text("\(hour)")
                             }
@@ -103,13 +93,13 @@ struct Home: View {
                         .clipped()
                     }
                     
+                    //Minutes picker
                     VStack {
-                        Text(" ")
-                        Text(" ")
+                        Spacer()
                         Text("Minutes")
                             .font(.headline)
                         
-                        Picker("Minutes", selection: self.$selectedMinutes) {
+                        Picker("Minutes", selection: $selectedMinutes) {
                             ForEach(minutes, id: \.self) { minute in
                                 Text("\(minute)")
                             }
@@ -119,13 +109,13 @@ struct Home: View {
                         .clipped()
                     }
                     
+                    //Seconds picker
                     VStack {
-                        Text(" ")
-                        Text(" ")
+                        Spacer()
                         Text("Seconds")
                             .font(.headline)
                         
-                        Picker("Seconds", selection: self.$selectedSeconds) {
+                        Picker("Seconds", selection: $selectedSeconds) {
                             ForEach(seconds, id: \.self) { second in
                                 Text("\(second)")
                             }
@@ -136,21 +126,19 @@ struct Home: View {
                     }
                 }
                 
+                // Start, pause and restart buttons
                 HStack(spacing: 20) {
                     Button(action: {
-                        if self.count == self.totalDuration {
-                            self.count = 0
-                            withAnimation(.default) {
-                                self.to = 0
-                            }
+                        if elapsedSeconds == totalDuration {
+                            resetTimer()
                         }
-                        self.start.toggle()
+                        isTimerRunning.toggle()
                     }) {
                         HStack(spacing: 15) {
-                            Image(systemName: self.start ? "pause.fill" : "play.fill")
+                            Image(systemName: isTimerRunning ? "pause.fill" : "play.fill")
                                 .foregroundColor(.white)
                             
-                            Text(self.start ? "Pause" : "Play")
+                            Text(isTimerRunning ? "Pause" : "Start")
                                 .foregroundColor(.white)
                         }
                         .padding(.vertical)
@@ -161,10 +149,7 @@ struct Home: View {
                     }
                     
                     Button(action: {
-                        self.count = 0
-                        withAnimation(.default) {
-                            self.to = 0
-                        }
+                        resetTimer()
                     }) {
                         HStack(spacing: 15) {
                             Image(systemName: "arrow.clockwise")
@@ -185,52 +170,38 @@ struct Home: View {
                 .padding(.top, 55)
             }
         }
-        .onAppear(perform: {
-            UNUserNotificationCenter.current().requestAuthorization(options: [.badge, .sound, .alert]) { (_, _) in
-            }
-        })
-        .onReceive(self.time) { (_) in
-            if self.start {
-                if self.count != self.totalDuration {
-                    self.count += 1
-                    print("Hi")
-                    
-                    withAnimation(.default) {
-                        self.to = CGFloat(self.count) / CGFloat(self.totalDuration)
-                    }
+        .onReceive(timer) { _ in
+            if isTimerRunning {
+                if elapsedSeconds < totalDuration {
+                    elapsedSeconds += 1
+                    timerProgress = CGFloat(elapsedSeconds) / CGFloat(totalDuration)
                 } else {
-                    self.start.toggle()
-                    self.Notify()
+                    isTimerRunning = false
                 }
             }
         }
     }
     
-    func formattedTime(seconds: Int) -> String {
+    //Reset timer
+    private func resetTimer() {
+        elapsedSeconds = 0
+        timerProgress = 0
+    }
+    
+    //Time formatted
+    private func formatTime(seconds: Int) -> String {
         let hours = seconds / 3600
         let minutes = (seconds % 3600) / 60
         let seconds = (seconds % 3600) % 60
         return String(format: "%02d:%02d:%02d", hours, minutes, seconds)
     }
-    
-    func Notify() {
-        let content = UNMutableNotificationContent()
-        content.title = "Studere"
-        content.body = "Timer is complete."
-        
-        let trigger = UNTimeIntervalNotificationTrigger(timeInterval: 1, repeats: false)
-        
-        let req = UNNotificationRequest(identifier: "MSG", content: content, trigger: trigger)
-        
-        UNUserNotificationCenter.current().add(req, withCompletionHandler: nil)
-    }
 }
 
 struct TimerViewControllerRepresentable: UIViewControllerRepresentable {
-    func makeUIViewController(context: Context) -> UIHostingController<ContentView> {
-        UIHostingController(rootView: ContentView())
+    func makeUIViewController(context: Context) -> UIHostingController<TimerView> {
+        UIHostingController(rootView: TimerView())
     }
     
-    func updateUIViewController(_ uiViewController: UIHostingController<ContentView>, context: Context) {
+    func updateUIViewController(_ uiViewController: UIHostingController<TimerView>, context: Context) {
     }
 }
